@@ -8,24 +8,36 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 public class TownyBlue extends JavaPlugin {
     public static Plugin plugin;
     public static FileConfiguration config;
-    public static Optional<BlueMapAPI> api;
-    public static MarkerAPI markerAPI;
 
 
     @Override
     public void onEnable() {
         register();
-        MarkerSet set = TownyBlueUpdater.CompleteUpdate();
-        try {
-            markerAPI.save();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!BlueMapAPI.getInstance().isPresent()) {
+            BlueMapAPI.onEnable(api -> {
+                try {
+                    MarkerAPI markerApi = api.getMarkerAPI();
+                    MarkerSet set = markerApi.createMarkerSet("towns");
+                    TownyBlueUpdater.CompleteUpdate(set);
+                    markerApi.save();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } else {
+            try {
+                MarkerAPI markerApi = BlueMapAPI.getInstance().get().getMarkerAPI();
+                MarkerSet set = markerApi.createMarkerSet("towns");
+                TownyBlueUpdater.CompleteUpdate(set);
+                markerApi.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -38,16 +50,9 @@ public class TownyBlue extends JavaPlugin {
         // vars
         setPlugin();
         setConfig();
+        saveDefaultConfig();
         // commands
         // listeners
-        // apis
-        api = BlueMapAPI.getInstance();
-        try {
-            markerAPI = api.get().getMarkerAPI();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        saveDefaultConfig();
         // schedules
     }
 
