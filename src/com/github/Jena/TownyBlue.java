@@ -19,22 +19,33 @@ public class TownyBlue extends JavaPlugin {
     public void onEnable() {
         register();
         if (!BlueMapAPI.getInstance().isPresent()) {
-            BlueMapAPI.onEnable(api -> {
+            BlueMapAPI.onEnable(BlueMapAPI -> {
                 try {
-                    MarkerAPI markerApi = api.getMarkerAPI();
-                    MarkerSet set = markerApi.createMarkerSet("towns");
+                    MarkerAPI api = BlueMapAPI.getMarkerAPI();
+
+                    if (api.getMarkerSets() != null) {
+                        for (MarkerSet set : api.getMarkerSets()) {
+                            api.removeMarkerSet(set);
+                        }
+                    }
+                    MarkerSet set = api.createMarkerSet("towns");
                     TownyBlueUpdater.CompleteUpdate(set);
-                    markerApi.save();
+                    api.save();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
         } else {
             try {
-                MarkerAPI markerApi = BlueMapAPI.getInstance().get().getMarkerAPI();
-                MarkerSet set = markerApi.createMarkerSet("towns");
+                MarkerAPI api = BlueMapAPI.getInstance().get().getMarkerAPI();
+                if (api.getMarkerSets() != null) {
+                    for (MarkerSet set : api.getMarkerSets()) {
+                        api.removeMarkerSet(set);
+                    }
+                }
+                MarkerSet set = api.createMarkerSet("towns");
                 TownyBlueUpdater.CompleteUpdate(set);
-                markerApi.save();
+                api.save();
             } catch (IOException e) {
                 e.printStackTrace();
             }
