@@ -3,6 +3,7 @@ package com.github.Jena;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.marker.MarkerAPI;
 import de.bluecolored.bluemap.api.marker.MarkerSet;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,6 +14,7 @@ import java.util.logging.Logger;
 public class TownyBlue extends JavaPlugin {
     public static Plugin plugin;
     public static FileConfiguration config;
+    public static MarkerSet set;
 
 
     @Override
@@ -25,10 +27,11 @@ public class TownyBlue extends JavaPlugin {
 
                     if (api.getMarkerSets() != null) {
                         for (MarkerSet set : api.getMarkerSets()) {
+                            if (set.getId().equals("towns"))
                             api.removeMarkerSet(set);
                         }
                     }
-                    MarkerSet set = api.createMarkerSet("towns");
+                    set = api.createMarkerSet("towns");
                     TownyBlueUpdater.CompleteUpdate(set);
                     api.save();
                 } catch (IOException e) {
@@ -43,7 +46,7 @@ public class TownyBlue extends JavaPlugin {
                         api.removeMarkerSet(set);
                     }
                 }
-                MarkerSet set = api.createMarkerSet("towns");
+                set = api.createMarkerSet("towns");
                 TownyBlueUpdater.CompleteUpdate(set);
                 api.save();
             } catch (IOException e) {
@@ -64,7 +67,9 @@ public class TownyBlue extends JavaPlugin {
         saveDefaultConfig();
         // commands
         // listeners
+        getServer().getPluginManager().registerEvents(new TownyBlueListener(), this);
         // schedules
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, TownyBlueUpdater.CompleteUpdate, 0, 72000);
     }
 
     public void setPlugin() {
