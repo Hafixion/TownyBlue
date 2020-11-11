@@ -15,7 +15,7 @@ public class TownyBlue extends JavaPlugin {
     public static Plugin plugin;
     public static FileConfiguration config;
     public static MarkerSet set;
-
+    public static MarkerAPI api;
 
     @Override
     public void onEnable() {
@@ -31,6 +31,7 @@ public class TownyBlue extends JavaPlugin {
                             api.removeMarkerSet(set);
                         }
                     }
+                    TownyBlue.api = api;
                     set = api.createMarkerSet("towns");
                     TownyBlueUpdater.CompleteUpdate(set);
                     api.save();
@@ -41,6 +42,7 @@ public class TownyBlue extends JavaPlugin {
         } else {
             try {
                 MarkerAPI api = BlueMapAPI.getInstance().get().getMarkerAPI();
+                TownyBlue.api = api;
                 if (api.getMarkerSets() != null) {
                     for (MarkerSet set : api.getMarkerSets()) {
                         api.removeMarkerSet(set);

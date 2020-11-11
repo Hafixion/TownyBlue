@@ -10,10 +10,8 @@ import com.palmergames.bukkit.towny.object.TownyWorld;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
 import de.bluecolored.bluemap.api.BlueMapWorld;
-import de.bluecolored.bluemap.api.marker.MarkerSet;
-import de.bluecolored.bluemap.api.marker.POIMarker;
+import de.bluecolored.bluemap.api.marker.*;
 import de.bluecolored.bluemap.api.marker.Shape;
-import de.bluecolored.bluemap.api.marker.ShapeMarker;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -24,12 +22,17 @@ public class TownyBlueUpdater {
     public static Runnable CompleteUpdate = TownyBlueUpdater::CompleteUpdateTask;
     //todo add config values
     public static Color towncolor = new Color(255, 0 , 0, 100);
-    public static Color nationcolor = new Color(25, 25, 255, 100);
+    public static Color nationcolor = new Color(0, 190, 200, 100);
 
 
     public static void CompleteUpdate(MarkerSet set) {
         try {
-            if (BlueMapAPI.getInstance().isPresent() && BlueMapAPI.getInstance().get().getMarkerAPI().getMarkerSet("towns").isPresent()) {
+            if (BlueMapAPI.getInstance().isPresent()) {
+
+                if (BlueMapAPI.getInstance().get().getMarkerAPI().getMarkerSet("towns").isPresent()) {
+                    BlueMapAPI.getInstance().get().getMarkerAPI().removeMarkerSet("towns");
+                }
+                BlueMapAPI.getInstance().get().getMarkerAPI().createMarkerSet("towns");
                 for (BlueMapWorld world1 : BlueMapAPI.getInstance().get().getWorlds()) {
                     for (BlueMapMap map : world1.getMaps()) {
                         World world = Bukkit.getWorld(map.getWorld().getUuid());
@@ -61,6 +64,7 @@ public class TownyBlueUpdater {
                                 }
                             }
                         }
+                        BlueMapAPI.getInstance().get().getMarkerAPI().save();
                     }
                 }
 
@@ -79,6 +83,11 @@ public class TownyBlueUpdater {
                             for (TownBlock townBlock : town.getTownBlocks()) {
                                 double xvalue = townBlock.getCoord().getX() * 16;
                                 double zvalue = townBlock.getCoord().getZ() * 16;
+                                String townblockname = townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16;
+
+                                if (set.getMarker(townblockname).isPresent()) {
+                                    set.removeMarker(set.getMarker(townblockname).get());
+                                }
 
                                 Shape shape = Shape.createRect(xvalue, zvalue, xvalue + 16, zvalue + 16);
                                 ShapeMarker marker = set.createShapeMarker(townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16, map, shape, TownyBlue.config.getInt("y-height"));
@@ -102,11 +111,12 @@ public class TownyBlueUpdater {
                                     }
                                 }
                             }
+                            BlueMapAPI.getInstance().get().getMarkerAPI().save();
                         }
                     }
                 }
             }
-        } catch (NotRegisteredException e) {
+        } catch (NotRegisteredException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -115,6 +125,11 @@ public class TownyBlueUpdater {
         MarkerSet set = TownyBlue.set;
         if (set != null) {
             CompleteUpdate(set);
+            try {
+                TownyBlue.api.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -136,7 +151,7 @@ public class TownyBlueUpdater {
             }
             Html = Html.replace("%mayor%", town.getMayor().getName());
             Html = Html.replace("%residents%", stringresidents);
-            Html = Html.replace("%residentcount%", String.valueOf(town.getResidents().stream().toArray().length));
+            Html = Html.replace("%residentcount%", String.valueOf(town.getResidents().toArray().length));
             // add extra placeholders here, just Html = Html.replace("%yourplaceholder%", thing);
 
         } else {Html = "";}
