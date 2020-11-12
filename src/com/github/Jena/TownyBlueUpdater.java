@@ -14,12 +14,13 @@ import de.bluecolored.bluemap.api.marker.*;
 import de.bluecolored.bluemap.api.marker.Shape;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.awt.*;
 import java.io.IOException;
 
 public class TownyBlueUpdater {
-    public static Runnable CompleteUpdate = TownyBlueUpdater::CompleteUpdateTask;
+    private static final FileConfiguration config = TownyBlue.config;
     //todo add config values
     public static Color towncolor = new Color(255, 0 , 0, 100);
     public static Color nationcolor = new Color(0, 190, 200, 100);
@@ -28,113 +29,64 @@ public class TownyBlueUpdater {
     public static void CompleteUpdate(MarkerSet set) {
         try {
             if (BlueMapAPI.getInstance().isPresent()) {
-
                 if (BlueMapAPI.getInstance().get().getMarkerAPI().getMarkerSet("towns").isPresent()) {
                     BlueMapAPI.getInstance().get().getMarkerAPI().removeMarkerSet("towns");
                 }
                 BlueMapAPI.getInstance().get().getMarkerAPI().createMarkerSet("towns");
+
                 for (BlueMapWorld world1 : BlueMapAPI.getInstance().get().getWorlds()) {
                     for (BlueMapMap map : world1.getMaps()) {
                         World world = Bukkit.getWorld(map.getWorld().getUuid());
-                        TownyWorld townyWorld = TownyAPI.getInstance().getTownyWorld(world.getName());
+                        if (world != null) {
+                            TownyWorld townyWorld = TownyAPI.getInstance().getTownyWorld(world.getName());
 
-                        for (TownBlock townBlock : townyWorld.getTownBlocks()) {
-                            double xvalue = townBlock.getCoord().getX() * 16;
-                            double zvalue = townBlock.getCoord().getZ() * 16;
-
-                            Shape shape = Shape.createRect(xvalue, zvalue, xvalue + 16, zvalue + 16);
-                            ShapeMarker marker = set.createShapeMarker(townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16, map, shape, TownyBlue.config.getInt("y-height"));
-                            marker.setLabel(getHTMLforTown(townBlock.getTown()));
-                            marker.setMaxDistance(1000);
-
-                            if (townBlock.getTown().hasNation()) {
-                                marker.setFillColor(nationcolor);
-                            } else {marker.setFillColor(towncolor);}
-                            marker.setBorderColor(marker.getFillColor());
-
-                            if (townBlock.isHomeBlock()) {
-                                Vector3d vector = new Vector3d(xvalue + 8, TownyBlue.config.getInt("y-height") + 3, zvalue + 8);
-                                POIMarker home = set.createPOIMarker(townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16 + "_icon", map, vector);
-                                home.setLabel(getHTMLforTown(townBlock.getTown()));
-                                home.setIcon(TownyBlue.config.getString("home-marker"), home.getIconAnchor());
-                                home.setMaxDistance(TownyBlue.config.getInt("max-distance"));
-
-                                if (townBlock.getTown().isCapital()) {
-                                    home.setIcon(TownyBlue.config.getString("capital-marker"), home.getIconAnchor());
-                                }
-                            }
-                        }
-                        BlueMapAPI.getInstance().get().getMarkerAPI().save();
-                    }
-                }
-
-            }
-        } catch (NotRegisteredException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void TownUpdate(Town town, MarkerSet set) {
-        try {
-            if (BlueMapAPI.getInstance().isPresent()) {
-                for (BlueMapWorld world1 : BlueMapAPI.getInstance().get().getWorlds()) {
-                    for (BlueMapMap map : world1.getMaps()) {
-                        if (map.getWorld().getUuid() == town.getWorld().getUID()) {
-                            for (TownBlock townBlock : town.getTownBlocks()) {
+                            for (TownBlock townBlock : townyWorld.getTownBlocks()) {
                                 double xvalue = townBlock.getCoord().getX() * 16;
                                 double zvalue = townBlock.getCoord().getZ() * 16;
-                                String townblockname = townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16;
+                                int y = config.getInt("y-height");
 
-                                if (set.getMarker(townblockname).isPresent()) {
-                                    set.removeMarker(set.getMarker(townblockname).get());
-                                }
-
+                                // shape
                                 Shape shape = Shape.createRect(xvalue, zvalue, xvalue + 16, zvalue + 16);
-                                ShapeMarker marker = set.createShapeMarker(townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16, map, shape, TownyBlue.config.getInt("y-height"));
+                                ShapeMarker marker = set.createShapeMarker(townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16, map, shape, y);
                                 marker.setLabel(getHTMLforTown(townBlock.getTown()));
-                                marker.setMaxDistance(1000);
+                                marker.setMaxDistance(1500);
 
+                                // color
                                 if (townBlock.getTown().hasNation()) {
                                     marker.setFillColor(nationcolor);
-                                } else {marker.setFillColor(towncolor);}
+                                } else {
+                                    marker.setFillColor(towncolor);
+                                }
                                 marker.setBorderColor(marker.getFillColor());
 
+                                // homeblock marker
                                 if (townBlock.isHomeBlock()) {
-                                    Vector3d vector = new Vector3d(xvalue + 8, TownyBlue.config.getInt("y-height") + 3, zvalue + 8);
-                                    POIMarker home = set.createPOIMarker(townBlock.getTown().getName() + "_icon", map, vector);
+                                    Vector3d vector = new Vector3d(xvalue + 8, y + config.getInt("marker-offset"), zvalue + 8);
+                                    POIMarker home = set.createPOIMarker(townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16 + "_icon", map, vector);
                                     home.setLabel(getHTMLforTown(townBlock.getTown()));
-                                    home.setIcon(TownyBlue.config.getString("home-marker"), home.getIconAnchor());
-                                    home.setMaxDistance(TownyBlue.config.getInt("max-distance"));
+                                    home.setIcon(config.getString("home-marker"), home.getIconAnchor());
+                                    home.setMaxDistance(config.getInt("max-distance"));
 
                                     if (townBlock.getTown().isCapital()) {
-                                        home.setIcon(TownyBlue.config.getString("capital-marker"), home.getIconAnchor());
+                                        home.setIcon(config.getString("capital-marker"), home.getIconAnchor());
                                     }
                                 }
                             }
-                            BlueMapAPI.getInstance().get().getMarkerAPI().save();
+                            if (TownyBlue.api != null) {
+                                TownyBlue.api.save();
+                            }
                         }
                     }
                 }
+
             }
         } catch (NotRegisteredException | IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    private static void CompleteUpdateTask() {
-        MarkerSet set = TownyBlue.set;
-        if (set != null) {
-            CompleteUpdate(set);
-            try {
-                TownyBlue.api.save();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
     public static String getHTMLforTown(Town town) {
-        String Html = TownyBlue.config.getString("html");
+        String Html = config.getString("html");
         if (Html != null) {
             String stringresidents = getResidents(town);
 
