@@ -1,3 +1,4 @@
+# Towny-BlueMap configuration
 
 # Html on the label, see what the default values look like here https://gyazo.com/91fb41d565cdfe35fa666aaf22823076
 # Valid Placeholders are: %name%, %nation%, %mayor%, %residents%, %residentcount%.
@@ -8,12 +9,18 @@ y-height: 62
 # How much higher/lower Town markers are in relation to the borders
 marker-offset: 1
 
-# Image URLS, capital-marker is for nation capitals.
+# Image URLS, capital-marker is for nation capitals. (FYI Default values are copyrighted, don't suggest using them.)
 home-marker: https://i.imgur.com/uzklZMv.png
 capital-marker: https://i.imgur.com/51isVaU.png
 
 # Maximum distance Home/Capital Markers can be seen from
 max-distance: 375
+
+# Whether or not automatic updating is enabled, untested and probably laggy.
+updating: false
+# How often it updates (For now, it'll update using listeners/a more efficient complete update later on.)
+# Value in seconds, recommended above 5-10 minutes.
+update: 600
 
 # Made by Jena-bot, send me a message on discord! Jena#4092
 # if you want support for this alpha build check out https://discord.gg/zmkyJa3

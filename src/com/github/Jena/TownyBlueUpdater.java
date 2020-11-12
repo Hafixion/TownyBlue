@@ -20,6 +20,7 @@ import java.awt.*;
 import java.io.IOException;
 
 public class TownyBlueUpdater {
+    protected static Runnable Update = TownyBlueUpdater::Update;
     private static final FileConfiguration config = TownyBlue.config;
     //todo add config values
     public static Color towncolor = new Color(255, 0 , 0, 100);
@@ -82,6 +83,23 @@ public class TownyBlueUpdater {
             }
         } catch (NotRegisteredException | IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void Update() {
+        if (TownyBlue.api != null && BlueMapAPI.getInstance().isPresent()) {
+            MarkerAPI api = TownyBlue.api;
+            try {
+                api.load();
+                MarkerSet set;
+
+                if (!api.getMarkerSet("towns").isPresent()) {
+                    set = api.createMarkerSet("towns");
+                } else {set = api.getMarkerSet("towns").get();}
+
+                CompleteUpdate(set);
+            } catch (IOException e) {e.printStackTrace();}
+
         }
     }
 

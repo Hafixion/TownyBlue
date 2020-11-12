@@ -3,6 +3,7 @@ package com.github.Jena;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.marker.MarkerAPI;
 import de.bluecolored.bluemap.api.marker.MarkerSet;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -58,6 +59,10 @@ public class TownyBlue extends JavaPlugin {
                 MarkerSet set = api.createMarkerSet("towns");
                 TownyBlueUpdater.CompleteUpdate(set);
             } catch (IOException e) {e.printStackTrace();}
+        }
+
+        if (config.getBoolean("updating")) {
+            Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, TownyBlueUpdater.Update, 0, config.getLong("update"));
         }
     }
 
