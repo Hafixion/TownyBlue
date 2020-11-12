@@ -19,8 +19,8 @@ max-distance: 375
 # Whether or not automatic updating is enabled, untested and probably laggy.
 updating: false
 # How often it updates (For now, it'll update using listeners/a more efficient complete update later on.)
-# Value in seconds, recommended above 5-10 minutes.
-update: 600
+# Value in seconds, recommended above 1-3 minutes.
+update: 180
 
 # Made by Jena-bot, send me a message on discord! Jena#4092
 # if you want support for this alpha build check out https://discord.gg/zmkyJa3
