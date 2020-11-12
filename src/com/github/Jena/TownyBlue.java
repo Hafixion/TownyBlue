@@ -62,7 +62,7 @@ public class TownyBlue extends JavaPlugin {
         }
 
         if (config.getBoolean("updating")) {
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, TownyBlueUpdater.Update, 0, config.getLong("update"));
+            Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, TownyBlueUpdater.Update, 0, config.getLong("update") * 20);
         }
     }
 

@@ -1,5 +1,5 @@
-name: Towny-BlueMap
-version: 0.1.0
+name: TownyBlue
+version: 0.4.3
 main: com.github.Jena.TownyBlue
 api-version: 1.16
 author: Jena

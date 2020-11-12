@@ -1,4 +1,4 @@
-# Towny-BlueMap configuration
+# TownyBlue configuration
 
 # Html on the label, see what the default values look like here https://gyazo.com/91fb41d565cdfe35fa666aaf22823076
 # Valid Placeholders are: %name%, %nation%, %mayor%, %residents%, %residentcount%.

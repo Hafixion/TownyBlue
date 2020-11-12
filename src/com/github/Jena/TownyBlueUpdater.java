@@ -91,11 +91,13 @@ public class TownyBlueUpdater {
             MarkerAPI api = TownyBlue.api;
             try {
                 api.load();
-                MarkerSet set;
-
-                if (!api.getMarkerSet("towns").isPresent()) {
-                    set = api.createMarkerSet("towns");
-                } else {set = api.getMarkerSet("towns").get();}
+                if (api.getMarkerSets() != null) {
+                    for (MarkerSet set : api.getMarkerSets()) {
+                        if (set.getId().equals("towns"))
+                            api.removeMarkerSet(set);
+                    }
+                }
+                MarkerSet set = api.createMarkerSet("towns");
 
                 CompleteUpdate(set);
             } catch (IOException e) {e.printStackTrace();}
