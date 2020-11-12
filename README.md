@@ -2,8 +2,6 @@
 Adds Town borders to your BlueMap.
 
 ![](https://forthebadge.com/images/badges/0-percent-optimized.svg) 
-
-![](https://forthebadge.com/images/badges/powered-by-black-magic.svg) 
 ### Building
 Requires Intellij IDE.
 ***
