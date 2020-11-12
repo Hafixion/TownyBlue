@@ -1,4 +1,5 @@
-## TownyBlue
+![](https://img.shields.io/badge/Towny-Blue-blue?color=09C6F9&labelColor=007ec6&style=for-the-badge&logoWidth=10000)
+***
 Adds Town borders to your BlueMap.
 
 ![](https://forthebadge.com/images/badges/0-percent-optimized.svg) 
