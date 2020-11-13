@@ -15,6 +15,7 @@ import de.bluecolored.bluemap.api.marker.Shape;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.awt.*;
 import java.io.IOException;
@@ -30,10 +31,6 @@ public class TownyBlueUpdater {
     public static void CompleteUpdate(MarkerSet set) {
         try {
             if (BlueMapAPI.getInstance().isPresent()) {
-                if (BlueMapAPI.getInstance().get().getMarkerAPI().getMarkerSet("towns").isPresent()) {
-                    BlueMapAPI.getInstance().get().getMarkerAPI().removeMarkerSet("towns");
-                }
-                BlueMapAPI.getInstance().get().getMarkerAPI().createMarkerSet("towns");
 
                 for (BlueMapWorld world1 : BlueMapAPI.getInstance().get().getWorlds()) {
                     for (BlueMapMap map : world1.getMaps()) {
@@ -73,19 +70,17 @@ public class TownyBlueUpdater {
                                     }
                                 }
                             }
-                            if (TownyBlue.api != null) {
-                                TownyBlue.api.save();
-                            }
                         }
                     }
                 }
 
             }
-        } catch (NotRegisteredException | IOException e) {
+        } catch (NotRegisteredException e) {
             e.printStackTrace();
         }
     }
 
+    // async update
     public static void Update() {
         if (TownyBlue.api != null && BlueMapAPI.getInstance().isPresent()) {
             MarkerAPI api = TownyBlue.api;
@@ -99,7 +94,13 @@ public class TownyBlueUpdater {
                 }
                 MarkerSet set = api.createMarkerSet("towns");
 
-                CompleteUpdate(set);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        CompleteUpdate(set);
+                    }
+                }.runTaskLater(TownyBlue.plugin, 1);
+                api.save();
             } catch (IOException e) {e.printStackTrace();}
 
         }
