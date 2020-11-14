@@ -10,25 +10,30 @@ import com.palmergames.bukkit.towny.object.TownyWorld;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
 import de.bluecolored.bluemap.api.BlueMapWorld;
-import de.bluecolored.bluemap.api.marker.*;
+import de.bluecolored.bluemap.api.marker.MarkerSet;
+import de.bluecolored.bluemap.api.marker.POIMarker;
 import de.bluecolored.bluemap.api.marker.Shape;
+import de.bluecolored.bluemap.api.marker.ShapeMarker;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.awt.*;
-import java.io.IOException;
 
-public class TownyBlueUpdater {
-    protected static Runnable Update = TownyBlueUpdater::Update;
+public class TownyBlueTask extends BukkitRunnable {
+    public MarkerSet set;
     private static final FileConfiguration config = TownyBlue.config;
     //todo add config values
     public static Color towncolor = new Color(255, 0 , 0, 100);
     public static Color nationcolor = new Color(0, 190, 200, 100);
 
+    public TownyBlueTask(MarkerSet set) {
+        this.set = set;
+    }
 
-    public static void CompleteUpdate(MarkerSet set) {
+    @Override
+    public void run() {
         try {
             if (BlueMapAPI.getInstance().isPresent()) {
 
@@ -48,6 +53,7 @@ public class TownyBlueUpdater {
                                 ShapeMarker marker = set.createShapeMarker(townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16, map, shape, y);
                                 marker.setLabel(getHTMLforTown(townBlock.getTown()));
                                 marker.setMaxDistance(1500);
+                                TownyBlue.logger.info("townblock registered" + marker.getId());
 
                                 // color
                                 if (townBlock.getTown().hasNation()) {
@@ -77,32 +83,6 @@ public class TownyBlueUpdater {
             }
         } catch (NotRegisteredException e) {
             e.printStackTrace();
-        }
-    }
-
-    // async update
-    public static void Update() {
-        if (TownyBlue.api != null && BlueMapAPI.getInstance().isPresent()) {
-            MarkerAPI api = TownyBlue.api;
-            try {
-                api.load();
-                if (api.getMarkerSets() != null) {
-                    for (MarkerSet set : api.getMarkerSets()) {
-                        if (set.getId().equals("towns"))
-                            api.removeMarkerSet(set);
-                    }
-                }
-                MarkerSet set = api.createMarkerSet("towns");
-
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        CompleteUpdate(set);
-                    }
-                }.runTaskLater(TownyBlue.plugin, 1);
-                api.save();
-            } catch (IOException e) {e.printStackTrace();}
-
         }
     }
 
@@ -150,6 +130,3 @@ public class TownyBlueUpdater {
         return result;
     }
 }
-/*
-*
-* */
