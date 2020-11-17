@@ -10,8 +10,8 @@ import com.palmergames.bukkit.towny.object.TownyWorld;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
 import de.bluecolored.bluemap.api.BlueMapWorld;
-import de.bluecolored.bluemap.api.marker.*;
 import de.bluecolored.bluemap.api.marker.Shape;
+import de.bluecolored.bluemap.api.marker.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -135,16 +135,18 @@ public class TownyBlueUpdater {
         String result = "";
         StringBuilder resultBuilder = new StringBuilder(result);
         resultBuilder.append(town.getMayor().getName());
+        resultBuilder.append(", ");
 
         for (Resident resident : town.getResidents()) {
-            if (resident.getName() != null) {
-                if (!resident.isMayor()) {
-                    resultBuilder.append(", ");
-                    resultBuilder.append(resident.getName());
+            if (resident.getName() != null && !resident.isMayor()) {
+                if (result.length() % 10 == 0 && result.length() % 8 == 0) {
+                    resultBuilder.append("<br>");
                 }
+                resultBuilder.append(", ");
+                resultBuilder.append(resident.getName());
             }
+            result = resultBuilder.toString();
         }
-        result = resultBuilder.toString();
 
         return result;
     }
