@@ -50,7 +50,7 @@ public class TownyBlueUpdater {
                                 Shape shape = Shape.createRect(xvalue, zvalue, xvalue + 16, zvalue + 16);
                                 ShapeMarker marker = set.createShapeMarker(townBlock.getTown().getName() + "_" + xvalue / 16 + "_" + zvalue / 16, map, shape, y);
                                 marker.setLabel(getHTMLforTown(townBlock.getTown()));
-                                marker.setMaxDistance(1500);
+                                marker.setMaxDistance(3500);
 
                                 // color
                                 if (townBlock.getTown().hasNation()) {
@@ -137,13 +137,14 @@ public class TownyBlueUpdater {
         resultBuilder.append(town.getMayor().getName());
         resultBuilder.append(", ");
 
+        int n = 0;
         for (Resident resident : town.getResidents()) {
             if (resident.getName() != null && !resident.isMayor()) {
-                if (result.length() % 10 == 0 && result.length() % 8 == 0) {
+                if (n != 0 && n % 5 == 0) {
                     resultBuilder.append("<br>");
-                }
-                resultBuilder.append(", ");
+                } else {resultBuilder.append(", ");}
                 resultBuilder.append(resident.getName());
+                n = n + 1;
             }
             result = resultBuilder.toString();
         }
