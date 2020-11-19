@@ -135,7 +135,6 @@ public class TownyBlueUpdater {
         String result = "";
         StringBuilder resultBuilder = new StringBuilder(result);
         resultBuilder.append(town.getMayor().getName());
-        resultBuilder.append(", ");
 
         int n = 0;
         for (Resident resident : town.getResidents()) {
